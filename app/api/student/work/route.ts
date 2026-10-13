@@ -1,0 +1,5 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { identity,db,bad,sameOrigin } from '@/lib/server';
+import { normalizeWorksheet } from '@/lib/data';
+export async function GET(){const who=await identity('student');if(!who?.groupId)return bad('모둠 입장이 필요합니다.',401);try{const {data,error}=await db().from('class_groups').select('id,group_number,stage,worksheet,messages,leave_count,updated_at').eq('id',who.groupId).single();if(error)throw error;return NextResponse.json({group:data});}catch{return bad('활동지를 불러오지 못했습니다.',503);}}
+export async function PATCH(req:NextRequest){if(!sameOrigin(req))return bad('허용되지 않은 요청입니다.',403);const who=await identity('student');if(!who?.groupId)return bad('모둠 입장이 필요합니다.',401);const body=await req.json();const stage=Number(body.stage);if(!Number.isInteger(stage)||stage<1||stage>5)return bad('단계가 올바르지 않습니다.');const worksheet=normalizeWorksheet(body.worksheet);try{const {error}=await db().from('class_groups').update({stage,worksheet,updated_at:new Date().toISOString(),last_seen:new Date().toISOString()}).eq('id',who.groupId);if(error)throw error;return NextResponse.json({ok:true});}catch{return bad('저장에 실패했습니다.',503);}}

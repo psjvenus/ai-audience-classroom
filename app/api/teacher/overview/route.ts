@@ -1,0 +1,3 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { identity,db,bad } from '@/lib/server';
+export async function GET(req:NextRequest){if(!await identity('teacher'))return bad('교사 인증이 필요합니다.',401);const id=req.nextUrl.searchParams.get('sessionId');if(!id||!/^[0-9a-f-]{36}$/i.test(id))return bad('수업 ID가 필요합니다.');try{const client=db();const {data:session,error:a}=await client.from('class_sessions').select('*').eq('id',id).single();if(a)throw a;const {data:groups,error:b}=await client.from('class_groups').select('*').eq('session_id',id).order('group_number');if(b)throw b;return NextResponse.json({session,groups});}catch{return bad('수업 정보를 불러올 수 없습니다.',404);}}
