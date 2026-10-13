@@ -62,3 +62,12 @@ th,td{padding:14px}
   body{background:white;color:#111}
   .card{box-shadow:none}
 }
+
+/* Softer lettering and distinctive heading colors */
+body{font-weight:400;font-synthesis:none;color:#4b4960}
+h1,h2,h3,h4,h5,h6,.title,.sectionTitle,.header h1,.trait h3{color:#6553bd;font-weight:400;letter-spacing:.01em}
+.hero h1{color:#5945b5}
+label,th{color:#51439b;font-weight:400}
+p,td,.bubble,.material,.notice,.trait{font-weight:400}
+button,.button,.stagebar button,.pill,.tag,strong,b{font-weight:400}
+input,textarea,select{font-weight:400;color:#4b4960}
