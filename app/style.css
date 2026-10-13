@@ -71,3 +71,14 @@ label,th{color:#51439b;font-weight:400}
 p,td,.bubble,.material,.notice,.trait{font-weight:400}
 button,.button,.stagebar button,.pill,.tag,strong,b{font-weight:400}
 input,textarea,select{font-weight:400;color:#4b4960}
+
+/* Classroom entry QR projection dialog */
+.qr-overlay{position:fixed;inset:0;z-index:1000;background:rgba(26,22,49,.76);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.qr-dialog{background:white;color:var(--ink);border-radius:26px;box-shadow:0 18px 70px #17152e44;padding:26px;width:min(95vw,680px);max-height:95vh;overflow-y:auto;text-align:center}
+.qr-dialog .title{text-align:left;margin:0}
+.qr-code-frame{display:flex;justify-content:center;align-items:center;background:#fff;padding:16px;margin:14px auto;max-width:min(100%,540px)}
+.qr-code-frame svg{display:block;width:min(100%,500px);height:auto;max-height:55vh}
+.qr-address{display:block;overflow-wrap:anywhere;color:#5945b5;font-size:clamp(14px,2.4vw,19px);margin:12px 0}
+.qr-open-button{min-height:52px}
+@media(max-width:520px){.qr-dialog{padding:15px}.qr-code-frame{padding:5px}}
+@media print{.qr-overlay{position:static;background:white}.qr-dialog{box-shadow:none}}
