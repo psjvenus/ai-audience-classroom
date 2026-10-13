@@ -11,7 +11,7 @@ create table if not exists public.class_groups (
  session_id uuid not null references public.class_sessions(id) on delete cascade,
  group_number integer not null check (group_number between 1 and 30),
  join_pin text not null,
- stage integer not null default 1 check (stage between 1 and 5),
+ stage integer not null default 1 check (stage between 1 and 6),
  worksheet jsonb not null default '{}'::jsonb,
  messages jsonb not null default '[]'::jsonb,
  leave_count integer not null default 0,
