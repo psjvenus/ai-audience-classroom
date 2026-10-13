@@ -6,6 +6,7 @@ export type Worksheet = {
  traits: Record<string, Trait>;
  materials: Material[];
  method: string;
+ review: string;
  sections: Record<string, Section>;
 };
 export type ChatMessage = { role: 'student' | 'ai'; body: string };
@@ -14,7 +15,7 @@ export const SECTIONS = ['도입부', '전개부', '정리부'];
 export const TYPES = ['글(책·신문 등)', '사진이나 그림', '도표나 그래프', '동영상', '실물'];
 export const METHODS = ['시간 순서', '공간의 이동', '원인과 결과', '문제와 문제 해결', '기타'];
 export function emptyWorksheet(): Worksheet {
- return { audience:'', topic:'', purpose:'', traits:Object.fromEntries(TRAITS.map(t=>[t,{quote:'',summary:'',reflect:'',reason:''}])), materials:Array.from({length:4},()=>({title:'',type:'',reframe:''})), method:'문제와 문제 해결', sections:Object.fromEntries(SECTIONS.map(s=>[s,{intent:'',main:'',media:''}])) };
+ return { audience:'', topic:'', purpose:'', traits:Object.fromEntries(TRAITS.map(t=>[t,{quote:'',summary:'',reflect:'',reason:''}])), materials:Array.from({length:4},()=>({title:'',type:'',reframe:''})), method:'문제와 문제 해결', review:'', sections:Object.fromEntries(SECTIONS.map(s=>[s,{intent:'',main:'',media:''}])) };
 }
 export function normalizeWorksheet(value: unknown): Worksheet {
  const base=emptyWorksheet();
@@ -25,6 +26,7 @@ export function normalizeWorksheet(value: unknown): Worksheet {
  for(const t of TRAITS) for(const k of ['quote','summary','reflect','reason'] as const) base.traits[t][k]=clean(v.traits?.[t]?.[k]);
  for(let i=0;i<4;i++) for(const k of ['title','type','reframe'] as const) base.materials[i][k]=clean(v.materials?.[i]?.[k]);
  base.method=METHODS.includes(v.method)?v.method:'기타';
+ base.review=clean(v.review,6000);
  for(const s of SECTIONS) for(const k of ['intent','main','media'] as const) base.sections[s][k]=clean(v.sections?.[s]?.[k]);
  return base;
 }
