@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {reviewPresentation} from '@/lib/review';
 import {emptyWorksheet,normalizeWorksheet,TRAITS,SECTIONS,TYPES,METHODS,Worksheet} from '@/lib/data';
-const audienceGptUrl=process.env.NEXT_PUBLIC_AUDIENCE_GPT_URL || '';
+const audienceGptUrl='https://chatgpt.com/g/g-6ac9ccb073708191a5e6f7c62f70ca6d-yesangceongjung-simyulreiteo';
 const names=['발표 계획','청중 특성 분석','청중 특성 반영','자료 조사·재구성','발표 내용 조직','예상 청중 검토'];
 async function call(path:string,method='GET',body?:unknown){const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});const data=await r.json();if(!r.ok)throw Error(data.error||'요청 실패');return data;}
 export default function Student(){
