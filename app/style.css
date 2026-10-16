@@ -93,3 +93,11 @@ input,textarea,select{font-weight:400;color:#4b4960}
 .demo-card .stack{gap:9px}
 @keyframes demo-appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.demo-reveal{animation:none}}
+
+/* Teacher demo: same form controls as student view, click to reveal */
+.demo-click-field{cursor:pointer;white-space:pre-wrap;caret-color:transparent}
+.demo-click-field:hover,.demo-select-click:hover select{border-color:#8473da;background:#faf9ff}
+.demo-click-field:focus-visible,.demo-select-click:focus-visible{outline:3px solid #b5a7ff;outline-offset:2px}
+.demo-select-click{cursor:pointer;border-radius:16px}
+.demo-select-click select{pointer-events:none;opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink);cursor:pointer}
+@media print{.demo-click-field{border:1px solid #ddd}.demo-select-click select{opacity:1}}
