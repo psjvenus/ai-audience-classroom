@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
-import {TRAITS,SECTIONS} from '@/lib/data';
+import {TRAITS,SECTIONS,TYPES,METHODS} from '@/lib/data';
 
 const GPT_URL='https://chatgpt.com/g/g-6ac9ccb073708191a5e6f7c62f70ca6d-yesangceongjung-simyulreiteo';
 const stages=['발표 계획','청중 특성 분석','청중 특성 반영','자료 조사·재구성','발표 내용 조직','예상 청중 검토'];
@@ -47,35 +47,42 @@ const examples:Example[][]=[
 ];
 
 export default function Demo(){
- const [stage,setStage]=useState(0);
- const [revealed,setRevealed]=useState(0);
- const [showGuide,setShowGuide]=useState(false);
+ const [stage,setStage]=useState(1);
+ const [opened,setOpened]=useState<string[]>([]);
  const [fullError,setFullError]=useState('');
- const fields=examples[stage];
- const allShown=revealed>=fields.length;
- function changeStage(next:number){setStage(next);setRevealed(0);setShowGuide(false);window.scrollTo({top:0,behavior:'smooth'});}
- async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();setFullError('');}catch{setFullError('전체 화면 전환을 사용할 수 없는 환경입니다.');}}
- return <main className="shell demo-shell">
-  <header className="header"><div><span className="pill">교사용 학생 활동 시범 · 가상 자료</span><h1>시범 모둠의 발표 준비</h1><span className="tiny">클릭할 때마다 예시 답안이 하나씩 열립니다. 학생 기록과 연결되지 않습니다.</span></div><div className="row"><button className="secondary" onClick={fullscreen}>⛶ 전체 화면</button><Link className="button secondary" href="/teacher">교사용 화면으로</Link></div></header>
+ const fieldValue=(label:string,atStage=stage)=>examples[atStage-1].find(f=>f.label===label)?.value||'';
+ const openKey=(label:string,atStage=stage)=>String(atStage)+':'+label;
+ const isOpen=(label:string,atStage=stage)=>opened.includes(openKey(label,atStage));
+ function toggle(label:string){const k=openKey(label);setOpened(current=>current.includes(k)?current.filter(x=>x!==k):[...current,k]);}
+ function changeStage(next:number){setStage(next);window.scrollTo({top:0,behavior:'smooth'});}
+ function textArea(label:string,key=label){
+   const visible=isOpen(key);
+   return <div key={key}><label>{label}</label><textarea className="demo-click-field" readOnly value={visible?fieldValue(key):''} onClick={()=>toggle(key)} title="클릭하면 예시 답안을 보이거나 숨깁니다." aria-label={label+' 예시 답안 열기 또는 숨기기'} placeholder="이 빈칸을 클릭하면 예시 답안이 나타납니다." /></div>;
+ }
+ function inputField(label:string,key=label){
+   return <div key={key}><label>{label}</label><input className="demo-click-field" readOnly value={isOpen(key)?fieldValue(key):''} onClick={()=>toggle(key)} placeholder="클릭하여 예시 확인하기"/></div>;
+ }
+ function selectField(label:string,values:string[],key=label){
+   const value=isOpen(key)?fieldValue(key):'';
+   return <div key={key}><label>{label}</label><div className="demo-select-click" role="button" tabIndex={0} aria-label={label+' 예시 선택 내용 보기'} onClick={()=>toggle(key)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(key);}}}><select value={value} disabled tabIndex={-1} aria-hidden="true"><option value="">클릭하여 예시 확인하기</option>{values.map(t=><option key={t} value={t}>{t}</option>)}</select></div></div>;
+ }
+ async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen();setFullError('');}catch{setFullError('이 브라우저에서는 전체 화면 전환을 지원하지 않을 수 있습니다.');}}
+ return <main className="shell">
+  <header className="header"><div><span className="pill">학생 활동 시범 · 가상 예시</span><h1>시범 모둠의 발표 준비</h1><span className="tiny">학생 화면과 같은 구성 · 빈칸을 클릭하면 그 칸에만 예시가 나타납니다. (학생 데이터와 무관)</span></div><div className="row"><button className="secondary" onClick={fullscreen}>⛶ 전체 화면</button><button className="secondary" onClick={()=>window.print()}>인쇄</button><Link className="button secondary" href="/teacher">교사용 화면으로</Link></div></header>
   {fullError&&<p className="error">{fullError}</p>}
-  <div className="progress"><div style={{width:`${(stage+1)/6*100}%`}}/></div>
-  <nav className="stagebar" aria-label="시범 단계">{stages.map((name,i)=><button type="button" key={name} className={stage===i?'active':''} onClick={()=>changeStage(i)}>{i+1}. {name}</button>)}</nav>
-  <section className="card demo-card">
-   <div className="row between"><h2 className="sectionTitle">📝 {stage+1}. {stages[stage]}</h2><span className="tag">{revealed} / {fields.length}개 공개</span></div>
-   <p className="muted">발표 주제: <strong>급식 잔반을 줄이자</strong> · 시범용 가상 자료</p>
-   {stage===1&&<div className="trait">
-     <h3>먼저 예상 청중 시뮬레이터를 만나 보세요!</h3>
-     <p>실제 학생들은 챗봇을 열기 전에 구글 계정으로 ChatGPT에 로그인하고, 발표 주제·목적·대상을 입력해 청중의 특성을 확인합니다.</p>
-     <button type="button" className="secondary" onClick={()=>setShowGuide(s=>!s)}>{showGuide?'설명 접기':'챗봇 사용 방법 보여주기'}</button>
-     {showGuide&&<div className="material"><p>① 구글 계정으로 ChatGPT 로그인</p><p>② 새 탭에서 챗봇 열기</p><p>③ 발표 주제·목적·대상 말하기</p><p>④ 청중이 알려 준 내용으로 2단계 활동지 작성하기</p><a href={GPT_URL} className="button" target="_blank" rel="noopener noreferrer">↗ 예상 청중 챗봇 열기</a></div>}
-    </div>}
-   <div className="stack" aria-live="polite">
-    {fields.slice(0,revealed).map((f,i)=><div className="trait demo-reveal" key={stage+'-'+i}><h3>{f.label}</h3><div className="demo-answer">{f.value}</div>{f.hint&&<p className="tiny">{f.hint}</p>}</div>)}
-   </div>
-   {!allShown&&<div className="demo-next-card"><p className="muted">다음 예시 내용을 학생들에게 하나씩 공개할 수 있습니다.</p><button type="button" onClick={()=>setRevealed(n=>Math.min(n+1,fields.length))}>예시 하나씩 보여주기 ({revealed+1}/{fields.length}) →</button></div>}
-   {allShown&&<p className="success">이 단계의 예시를 모두 살펴봤습니다.</p>}
+  <div className="progress"><div style={{width:`${stage/6*100}%`}}/></div>
+  <nav className="stagebar" aria-label="활동 단계">{stages.map((name,i)=><button type="button" key={name} className={stage===i+1?'active':''} onClick={()=>changeStage(i+1)}>{i+1}. {name}</button>)}</nav>
+  <section className="card">
+   <h2 className="sectionTitle">📝 {stage}. {stages[stage-1]}</h2>
+   <p className="tiny">시범용 가상 답안입니다. 각 칸을 누르면 예시가 나타나고, 다시 누르면 숨겨집니다.</p>
+   {stage===1&&<><p className="muted">발표 대상, 주제, 목적을 모둠원들과 상의하여 정하세요.</p>{textArea('발표 대상')}{textArea('발표 주제')}{textArea('발표 목적')}</>}
+   {stage===2&&<><div className="trait"><h3>먼저 예상 청중 시뮬레이터를 만나 보세요!</h3><p>① 챗봇을 열기 전에 <strong>구글 계정으로 ChatGPT에 로그인</strong>하세요. 학교에서 허용한 계정을 사용하고, 비밀번호를 친구에게 알려 주지 마세요.</p><p>② 아래 버튼을 눌러 예상 청중 시뮬레이터를 새 탭으로 열고 1단계에서 정한 발표 주제, 목적, 대상을 알려 주세요.</p><a className="button" href={GPT_URL} target="_blank" rel="noopener noreferrer">↗ 예상 청중 시뮬레이터 열기</a><p>③ 챗봇이 알려 준 내용을 읽고 이 화면으로 돌아와 아래 활동지를 작성하세요.</p><p className="tiny">이 예시는 실제 챗봇의 응답이 아니라 수업 시범용으로 작성한 가상 답안입니다.</p></div><p className="muted">예상 청중의 특성을 모둠에서 토의하고, 핵심을 우리 모둠의 말로 정리해 보세요.</p>{TRAITS.map(t=><div className="trait" key={t}><h3>{t}</h3>{textArea('예상 청중의 특성',t+' · 예상 청중의 특성')}{textArea('핵심 요약',t+' · 핵심 요약')}</div>)}</>}
+   {stage===3&&<><p className="muted">청중의 특성을 고려하여 발표에 반영할 내용과 이유를 작성하세요.</p>{TRAITS.map(t=><div className="trait" key={t}><h3>{t}</h3><p className="tiny">2단계 요약: {isOpen(t+' · 핵심 요약',2)?fieldValue(t+' · 핵심 요약',2):'아직 작성하지 않았어요'}</p>{textArea('내 발표에 반영할 내용',t+' · 반영할 내용')}{textArea('그렇게 정한 이유',t+' · 이유')}</div>)}</>}
+   {stage===4&&<><p className="muted">자료의 제목과 내용을 적고, 유형을 선택한 뒤 청중에게 맞게 재구성할 방법을 적으세요.</p>{[1,2,3,4].map(n=><div className="material" key={n}><h3>자료 {n}</h3>{textArea('자료 제목과 내용',`자료 ${n} · 제목과 내용`)}{selectField('자료 유형',TYPES,`자료 ${n} · 유형`)}{textArea('자료 재구성 방안',`자료 ${n} · 재구성 방안`)}{n===2&&<p className="tiny">자료 예시는 실제 조사 결과가 아닌 가상 시범 자료입니다. 실제 발표에서는 출처를 확인하세요.</p>}</div>)}</>}
+   {stage===5&&<>{selectField('내용 전개 방식',METHODS)}{SECTIONS.map(s=><div className="trait" key={s}><h3>{s}</h3>{textArea('의도와 목적',s+' · 의도와 목적')}{textArea('중심 내용',s+' · 중심 내용')}{textArea('활용할 자료',s+' · 활용할 자료')}</div>)}</>}
+   {stage===6&&<><p className="muted">발표 내용 조직을 마쳤다면 예상 청중의 입장에서 작성 내용을 점검해 보세요.</p><button type="button" onClick={()=>toggle('예상 청중의 의견')}>{isOpen('예상 청중의 의견')?'예상 청중 의견 숨기기':'예상 청중에게 검토받기'}</button>{isOpen('예상 청중의 의견')&&<div className="trait"><h3>예상 청중의 의견</h3><p className="wrap">{fieldValue('예상 청중의 의견')}</p><p className="tiny">시범용으로 미리 작성한 피드백이며 실제 AI가 생성한 답변이 아닙니다.</p></div>}</>}
    <div className="divider"/>
-   <div className="row between"><button className="secondary" disabled={stage===0} onClick={()=>changeStage(stage-1)}>← 이전 단계</button><div className="row"><button type="button" className="secondary" onClick={()=>setRevealed(0)}>현재 단계 다시 시작</button><button disabled={stage===5} onClick={()=>changeStage(stage+1)}>다음 단계 →</button></div></div>
+   <div className="row between"><button className="secondary" disabled={stage===1} onClick={()=>changeStage(stage-1)}>← 이전 단계</button><div className="row"><button type="button" className="secondary" onClick={()=>setOpened(curr=>curr.filter(k=>!k.startsWith(stage+':')))}>현재 단계 답안 모두 숨기기</button><button disabled={stage===6} onClick={()=>changeStage(stage+1)}>다음 단계 →</button></div></div>
   </section>
  </main>;
 }
