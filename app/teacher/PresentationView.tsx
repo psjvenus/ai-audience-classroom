@@ -2,7 +2,7 @@
 import {useState} from 'react';
 import {Worksheet,TRAITS,SECTIONS,TYPES,METHODS} from '@/lib/data';
 
-const audienceGptUrl=process.env.NEXT_PUBLIC_AUDIENCE_GPT_URL || '';
+const audienceGptUrl='https://chatgpt.com/g/g-6ac9ccb073708191a5e6f7c62f70ca6d-yesangceongjung-simyulreiteo';
 const steps=['발표 계획','청중 특성 분석','청중 특성 반영','자료 조사·재구성','발표 내용 조직','예상 청중 검토'];
 export default function PresentationView({groupNumber,sessionTitle,worksheet,onClose}:{groupNumber:number;sessionTitle:string;worksheet:Worksheet;onClose:()=>void}){
  const [step,setStep]=useState(5);
