@@ -82,3 +82,14 @@ input,textarea,select{font-weight:400;color:#4b4960}
 .qr-open-button{min-height:52px}
 @media(max-width:520px){.qr-dialog{padding:15px}.qr-code-frame{padding:5px}}
 @media print{.qr-overlay{position:static;background:white}.qr-dialog{box-shadow:none}}
+
+/* Click-through teaching demo */
+.demo-shell{max-width:1100px}
+.demo-card{min-height:440px}
+.demo-reveal{animation:demo-appear .22s ease-out}
+.demo-answer{font-size:20px;line-height:1.7;white-space:pre-wrap;word-break:keep-all;padding:6px 2px;color:#3d3956}
+.demo-next-card{padding:26px 10px;text-align:center}
+.demo-next-card button{width:min(100%,520px);font-size:20px}
+.demo-card .stack{gap:9px}
+@keyframes demo-appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.demo-reveal{animation:none}}
